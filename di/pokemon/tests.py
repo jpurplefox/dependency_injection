@@ -1,6 +1,7 @@
 import json
 
 from django.test import RequestFactory, TestCase
+from django.urls import resolve
 
 from pokemon.views import can_learn
 
@@ -29,3 +30,8 @@ class CanLearnTestCase(TestCase):
         data = json.loads(response.content)
 
         self.assertTrue(data['can_learn'])
+
+    def test_resolve_url_returns_can_learn_view(self):
+        match = resolve('/pokemon/squirtle/can_learn')
+
+        self.assertEqual(match.func, can_learn)
