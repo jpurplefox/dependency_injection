@@ -6,7 +6,7 @@ from django.http import JsonResponse
 def can_learn(request, pokemon):
     move_name = request.GET.get('move')
 
-    response = requests.get('https://pokeapi.co/api/v2/pokemon/squirtle')
+    response = requests.get(f'https://pokeapi.co/api/v2/pokemon/{pokemon}')
     data = response.json()
 
     for move in data['moves']:

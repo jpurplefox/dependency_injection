@@ -21,3 +21,11 @@ class CanLearnTestCase(TestCase):
         data = json.loads(response.content)
 
         self.assertFalse(data['can_learn'])
+
+    def test_charmander_can_learn_ember(self):
+        request = RequestFactory().get('/pokemon/charmander/can_learn', {'move': 'ember'})
+
+        response = can_learn(request, 'charmander')
+        data = json.loads(response.content)
+
+        self.assertTrue(data['can_learn'])
