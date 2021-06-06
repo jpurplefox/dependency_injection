@@ -4,15 +4,28 @@ from django.test import RequestFactory, TestCase
 from django.urls import resolve
 
 from pokemon.views import can_learn
-from pokemon.integrations import APIIntegration
+
+
+class FakeAPIIntegration:
+    def __init__(self, pokemons):
+        self.pokemons = pokemons
+
+    def can_learn(self, pokemon, move_name):
+        return move_name in self.pokemons.get(pokemon, [])
 
 
 class CanLearnTestCase(TestCase):
+    def setUp(self):
+        pokemons = {
+            'squirtle': ['bubble'],
+            'charmander': ['ember']
+        }
+        self.fake_integration = FakeAPIIntegration(pokemons)
+
     def test_squirtle_can_learn_bubble(self):
         request = RequestFactory().get('/pokemon/squirtle/can_learn', {'move': 'bubble'})
 
-        integration = APIIntegration()
-        response = can_learn(request, 'squirtle', integration)
+        response = can_learn(request, 'squirtle', self.fake_integration)
         data = json.loads(response.content)
 
         self.assertTrue(data['can_learn'])
@@ -20,8 +33,7 @@ class CanLearnTestCase(TestCase):
     def test_squirtle_cannot_learn_ember(self):
         request = RequestFactory().get('/pokemon/squirtle/can_learn', {'move': 'ember'})
 
-        integration = APIIntegration()
-        response = can_learn(request, 'squirtle', integration)
+        response = can_learn(request, 'squirtle', self.fake_integration)
         data = json.loads(response.content)
 
         self.assertFalse(data['can_learn'])
@@ -29,8 +41,7 @@ class CanLearnTestCase(TestCase):
     def test_charmander_can_learn_ember(self):
         request = RequestFactory().get('/pokemon/charmander/can_learn', {'move': 'ember'})
 
-        integration = APIIntegration()
-        response = can_learn(request, 'charmander', integration)
+        response = can_learn(request, 'charmander', self.fake_integration)
         data = json.loads(response.content)
 
         self.assertTrue(data['can_learn'])
