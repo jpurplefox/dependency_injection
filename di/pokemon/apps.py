@@ -1,6 +1,10 @@
 from django.apps import AppConfig
 
+from pokemon import container, views
+
 
 class PokemonConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
     name = 'pokemon'
+
+    def ready(self):
+        container.wire(modules=[views])
