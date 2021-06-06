@@ -4,6 +4,7 @@ from django.test import RequestFactory, TestCase
 from django.urls import resolve
 
 from pokemon import container
+from pokemon.integrations import Pokemon
 from pokemon.views import can_learn
 
 
@@ -11,15 +12,15 @@ class FakeAPIIntegration:
     def __init__(self, pokemons):
         self.pokemons = pokemons
 
-    def can_learn(self, pokemon, move_name):
-        return move_name in self.pokemons.get(pokemon, [])
+    def get_pokemon(self, pokemon):
+        return self.pokemons[pokemon]
 
 
 class CanLearnTestCase(TestCase):
     def setUp(self):
         pokemons = {
-            'squirtle': ['bubble'],
-            'charmander': ['ember']
+            'squirtle': Pokemon(moves_can_learn=['bubble']),
+            'charmander': Pokemon(moves_can_learn=['ember'])
         }
         self.fake_integration = FakeAPIIntegration(pokemons)
 
