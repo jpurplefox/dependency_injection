@@ -1,12 +1,9 @@
 from django.http import JsonResponse
 
-from pokemon.integrations import APIIntegration
 
-
-def can_learn(request, pokemon):
+def can_learn(request, pokemon, api_integration):
     move_name = request.GET.get('move')
 
-    integration = APIIntegration()
-    can_learn = integration.can_learn(pokemon, move_name)
+    can_learn = api_integration.can_learn(pokemon, move_name)
 
     return JsonResponse({'can_learn': can_learn})
