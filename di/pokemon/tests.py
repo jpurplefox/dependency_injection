@@ -13,7 +13,10 @@ class FakeAPIIntegration:
         self.pokemons = pokemons
 
     def get_pokemon(self, pokemon):
-        return self.pokemons[pokemon]
+        try:
+            return self.pokemons[pokemon]
+        except KeyError:
+            raise Pokemon.DoesNotExist()
 
 
 class CanLearnTestCase(TestCase):
@@ -50,6 +53,14 @@ class CanLearnTestCase(TestCase):
         data = json.loads(response.content)
 
         self.assertTrue(data['can_learn'])
+
+    def test_unown_king_does_not_exist(self):
+        request = RequestFactory().get('/pokemon/unown_king/can_learn', {'move': 'ember'})
+
+        with container.api_integration.override(self.fake_integration):
+            response = can_learn(request, 'unown_king')
+
+        self.assertTrue(response.status_code, 404)
 
     def test_resolve_url_returns_can_learn_view(self):
         match = resolve('/pokemon/squirtle/can_learn')
